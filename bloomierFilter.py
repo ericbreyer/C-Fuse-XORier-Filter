@@ -11,6 +11,7 @@ import functools
 import array
 import time
 from joblib import Parallel, delayed
+from typing import Union, Optional, Callable, Dict
 
 seed("Baker Comes First!")
 
@@ -34,41 +35,10 @@ def get_size(obj, seen=None):
         size += sum([get_size(i, seen) for i in obj])
     return size
 
-def hash_function_factory(m, seed):
+hash_function = Callable[[int | bytes | str], int]
+
+def hash_function_factory(m : int, seed : any) -> hash_function:
     return lambda x : int(murmurhash3_32(x, seed) % m)
-
-class bloom_filter:
-    def init_cn(self, c, n):
-        r_over_n = math.log(c, .618)
-        r = n * r_over_n
-        k = max(1, round(r_over_n * math.log(2)))
-        self.hashes = []
-        for _ in range(k):
-            self.hashes.append(hash_function_factory(r, random()))
-        self.bitarr = bitarray((0 for _ in range(2**math.ceil(math.log(r,2)))))
-        return self
-    
-    def init_nr(self, n, r):
-        r_over_n = r / n
-        k = max(1, round(r_over_n * math.log(2)))
-        self.hashes = []
-        for _ in range(k):
-            self.hashes.append(hash_function_factory(r, random()))
-        self.bitarr = bitarray((0 for _ in range(r)))
-        return self
-
-    def insert ( self , key ):
-        for hash in self.hashes:
-            self.bitarr[hash(key)] = 1
-    def test ( self , key ):
-        for hash in self.hashes:
-            if self.bitarr[hash(key)] == 0:
-                return False
-        return True
-    
-    def __sizeof__(self) -> int:
-        return sys.getsizeof(self.bitarr) + sys.getsizeof(self.hashes)
-
 
 # e - fp rate
 # k - num hash funcs
@@ -81,7 +51,7 @@ class bloom_filter:
 
 class bloomier_filter:
 
-    def __init__(self, elems, c, k, q):
+    def __init__(self, elems : Dict[any, any], c : float, k : int, q : int):
         start = time.time()
         self.m = int(c * len(elems))
         self.k = k
@@ -268,24 +238,28 @@ class bloomier_filter:
 data = pd.read_csv('user-ct-test-collection-01.txt', sep="\t")
 querylist = data.Query.dropna()
 
-function = defaultdict(int)
-# testSet = defaultdict(int)
+train_set = defaultdict(int)
+test_set = defaultdict(int)
+partition_size = .8 * len(querylist)
+
 
 for i, q in enumerate(querylist):
-    function[q] += 1
+    if i < partition_size:
+        train_set[q] += 1
+    else:
+        test_set[q] += 1
 
-total_keys_size = sum([get_size(key) for key in function])
-
-
-bf = bloomier_filter(function, 1.25, 3, 8)
-
-print(get_size(bf)/total_keys_size, get_size(function)/total_keys_size)
+total_keys_size = sum([get_size(key) for key in train_set])
 
 
-# for k in range(querylist):
-#     if bf.lookup(k) != None and not k in function:
-#         fp += 1
-#     if  not i in filledFunction:
-#         neg += trials
+bf = bloomier_filter(train_set, 1.25, 3, 8)
 
+print(get_size(bf)/total_keys_size, get_size(train_set)/total_keys_size)
+
+fp = 0
+for k in test_set:
+    if bf.lookup(k) != None and not k in train_set:
+        fp += 1
+
+print(fp/len(test_set))
 # test_set = [str(random()) for _ in range(TEST_NUM)]
