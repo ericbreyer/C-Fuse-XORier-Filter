@@ -1,6 +1,6 @@
 # C Fuse XORier Lookup Table
 
-C Fuse XORier Lookup Table is a C library that implements the [Fuse XORier Lookup Table](about:blank). 
+C Fuse XORier Lookup Table is a C library that implements the [Fuse XORier Lookup Table](https://www.overleaf.com/read/fjsbpjmdxhsy#0b85a3). 
 An FXLT is a static, probabilistic, associate array (map) in sublinear space. Similar to [Bloom](https://en.wikipedia.org/wiki/Bloom_filter) and [XOR filters](https://arxiv.org/pdf/1912.08258.pdf), an extension of the [Bloomier Filter](https://www.cs.princeton.edu/~chazelle/pubs/soda-rev04.pdf).
 
 ## Installation
