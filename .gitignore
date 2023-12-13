@@ -1,1 +1,5 @@
-user-ct-test-collection-01.txt
+build
+.vscode
+_legacy
+figures
+.ds_store

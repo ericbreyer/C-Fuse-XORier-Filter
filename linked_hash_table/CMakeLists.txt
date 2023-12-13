@@ -1,0 +1,2 @@
+target_include_directories(linked_hash_table PUBLIC . ./chaining_list)
+target_sources(linked_hash_table PRIVATE linked_hash_table.c linked_hash_table.h ./chaining_list/chaining_list.c ./chaining_list/chaining_list.h)
