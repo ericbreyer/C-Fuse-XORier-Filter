@@ -250,7 +250,7 @@ void fuseXORierLT_hashAll(struct fuseXORierLookupTable *self, SizedPointer elem,
 
         size_t firstSegmentStart =
             (murmur3_32(elem.ptr, elem.size, self->hash_seeds[self->k + 1]) %
-             (self->numSegments - self->k)) *
+             ((self->numSegments - self->k) ? (self->numSegments - self->k) : 1)) *
             self->segmentSize;
 
         for (size_t i = 0; i < self->k; ++i) {
@@ -446,20 +446,29 @@ struct fuseXORierLookupTable *build_fuseXORierLT(size_t n, SizedPointer keys[n],
             ? 0
             : ((k == 3) ? 4.8 * pow(n, .58) : .7 * pow(n, .65));
     segmentSize = roundUp2(segmentSize);
+    size_t numSegments = (segmentSize == 0) ? 0 : m / segmentSize + 1;
+    if (numSegments < k && numSegments > 0) {
+        segmentSize = numSegments = 0;
+    }
 
     struct fuseXORierLookupTable init = {
         .k = k,
         .q = sizeof(slot_t) * 8,
         .segmentSize = segmentSize,
         .n = n,
-        .m = (segmentSize == 0) ? m : segmentSize * (m / segmentSize + 1),
-        .numSegments = (segmentSize == 0) ? 0 : m / segmentSize + 1,
+        .m = (segmentSize == 0) ? m : segmentSize * numSegments,
+        .numSegments = numSegments,
         .table1 = malloc(sizeof *self->table1 * m),
         .table2 = malloc(sizeof *self->table2 * m),
         .verbose = flags & FXLT_FLAG_PRINT_STATS,
         .cacheHashes = flags & FXLT_FLAG_CACHE_HASHES,
     };
     memcpy(self, &init, sizeof init);
+
+    //print segment size and number of segments and m
+    printf("segmentSize: %ld\n", segmentSize);
+    printf("numSegments: %ld\n", self->numSegments);
+    printf("m: %ld\n", self->m);
 
     self->hash_seeds = malloc(sizeof *self->hash_seeds * (k + 2));
 

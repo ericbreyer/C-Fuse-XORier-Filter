@@ -12,7 +12,7 @@ link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 set(lib "fuse_XORier_lookup_table")
 add_library(${lib} SHARED)
-target_compile_options(${lib} PUBLIC -Wall -Wextra -g -Wno-implicit-fallthrough -O3  -lm)
+target_compile_options(${lib} PUBLIC -Wall -Wextra -g -Wno-implicit-fallthrough -Og  -lm)
 add_subdirectory(src)
 install(TARGETS ${lib})
 

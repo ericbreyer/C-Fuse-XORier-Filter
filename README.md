@@ -27,14 +27,14 @@ make main
 ```c
 #include <fuse_XORier_lookup_table.h>
 
-int n = 10000 /* the number of keys to be inserted */;
-SizedPointer keys[n] = /* <the keys> */;
-void *values[n] = /* <the values the keys map to> */;
+int n = 100 /* the number of keys to be inserted */;
+SizedPointer keys[n] = { {1, sizeof(int)}, {2, sizeof(int)}, ... , {100, sizeof(int)}} /* the keys */;
+void *values[n] = (uintptr_t *){1, 2, ... , 100}  /* the values the keys map to */;
 float c = 1.075 /* the constant multiple of n which is the size of the filter */;
 size_t k = 4 /* the number of hash functions to use */;
 
 struct fuseXORierLookupTable * FXLT = build_fuseXORierLT(n, keys, values, c, k, 0);
-void * val = fuseXORierLT_lookup(FXLT, /* SizedPointer elem */);
+void * val = fuseXORierLT_lookup(FXLT, (SizedPointer){rand() % 200, sizeof(int)});
 if(val == NULL) {
     // elem is definitely not in the map
 } else {
