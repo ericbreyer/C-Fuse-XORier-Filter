@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <sized_pointer.h>
+
+#include "sized_pointer.h"
 
 enum SlotState {
     kEmpty,

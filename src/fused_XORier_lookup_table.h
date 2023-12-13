@@ -3,8 +3,8 @@
 //------------------------------------------------------------------------------
 
 /**
- * @file fused_xorier_lookup_table.h
- * @author Eric Breyer (eric.breyer@gmail.com)
+ * @file fuse_xorier_lookup_table.h
+ * @author Eric Breyer (eric.breyer@gmail.com) [https://github.com/ericbreyer]
  * @brief Declaration of a fuse XORier lookup table
  * @version 1.0
  * @date 2023-12-12

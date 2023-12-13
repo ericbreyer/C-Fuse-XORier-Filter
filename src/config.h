@@ -1,6 +1,6 @@
 /**
  * @file config.h
- * @author Eric Breyer (eric.breyer@gmail.com)
+ * @author Eric Breyer (eric.breyer@gmail.com) [https://github.com/ericbreyer]
  * @brief Configuration file for fuse XORier lookup table
  * @version 1.0
  * @date 2023-12-12

@@ -3,11 +3,11 @@
 //------------------------------------------------------------------------------
 
 /**
- * @file fused_xorier_lookup_table.h
- * @author Eric Breyer (eric.breyer@gmail.com)
+ * @file fuse_xorier_lookup_table.h
+ * @author Eric Breyer (eric.breyer@gmail.com) [https://github.com/ericbreyer]
  * @brief Declaration of a fuse XORier lookup table
  * @version 1.0
- * @date 2023-12-12
+ * @date 2023-12-13
  *
  * @copyright Copyright (c) 2023, released under GNU Public Licence 3.0 or later
  *
@@ -483,8 +483,6 @@ struct fuseXORierLookupTable *build_fuseXORierLT(size_t n, SizedPointer keys[n],
             return NULL;
         }
 
-        // if (self->verbose)
-        // fprintf(stderr, "finding matching try: %ld\n", tries);
         for (size_t i = 0; i < k + 2; ++i) {
             self->hash_seeds[i] = random();
         }
@@ -495,8 +493,7 @@ struct fuseXORierLookupTable *build_fuseXORierLT(size_t n, SizedPointer keys[n],
             fprintf(stderr,
                     "                                                      "
                     "                                                      "
-                    "                       \r\033[1A      "
-                    "                                         \r");
+                    "                       \r");
 
         if (res.success) {
             break;

@@ -1,18 +1,25 @@
+//------------------------------------------------------------------------------
+// Information
+//------------------------------------------------------------------------------
+
 /**
  * @file main.c
- * @brief Test and example code for bloom filter
- * https://en.wikipedia.org/wiki/Bloom_filter
- * @author [Eric Breyer](https://github.com/ericbreyer)
- * @see bloom_filter.c, bloom_filter.h
+ * @author Eric Breyer (eric.breyer@gmail.com) [https://github.com/ericbreyer]
+ * @brief Main file for testing and profiling fuse XORier lookup table
+ * @version 1.0
+ * @date 2023-12-13
+ *
+ * @copyright Copyright (c) 2023, released under GNU Public Licence 3.0 or later
+ *
  */
+// SPDX-License-Identifier: GNU-3.0-or-later
 
-#include <assert.h> // assertions
-#include <fcntl.h>  /* For O_* constants */
+//------------------------------------------------------------------------------
+// Includes
+//------------------------------------------------------------------------------
+
 #include <math.h>
 #include <omp.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <stdbool.h>
 #include <stdint.h> // printing
 #include <stdio.h>  // printing
 #include <stdlib.h> // malloc
@@ -20,15 +27,27 @@
 #include <sys/stat.h> /* For mode constants */
 #include <time.h>
 
-#include <fused_XORier_lookup_table.h>
+#include "fused_XORier_lookup_table.h"
 #include "gnuplot_i.h"
 #include "hash_table.h"
 #include "linked_hash_table.h"
 #include "rbtree.h"
 
-#define MAX_THREADS 2
+//------------------------------------------------------------------------------
+// Defines
+//------------------------------------------------------------------------------
 
-void generate_hash_advantage_plot(int start, int end, int step, double c,
+/**
+ * @brief The maximum number of threads to use for parallelization
+ * 
+ */
+#define MAX_THREADS 4
+
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
+
+void generate_hash_advantage_plot(char * outfile, int start, int end, int step, double c,
                                   int k) {
     const int NPOINTS = (end - start) / step + 1;
     struct {
@@ -105,7 +124,9 @@ void generate_hash_advantage_plot(int start, int end, int step, double c,
     gnuplot_ctrl *h1 = gnuplot_init();
     // gnuplot_setstyle(h1, "lines");
     gnuplot_cmd(h1, "set terminal png size 1000,500\n");
-    gnuplot_cmd(h1, "set output \"myFile.png\"\n");
+    char * setoutputcmd = malloc(sizeof *setoutputcmd * (strlen(outfile) + 20));
+    sprintf(setoutputcmd, "set output \"%s\"\n", outfile);
+    gnuplot_cmd(h1, setoutputcmd);
     gnuplot_cmd(h1, "set multiplot layout 1,2\n");
 
     // print the n,time pairs to temp.dat
@@ -153,7 +174,7 @@ void generate_hash_advantage_plot(int start, int end, int step, double c,
 
     gnuplot_close(h1);
 }
-void generate_FXLT_vs_other_maps_plot(int start, int end, int step, double c,
+void generate_FXLT_vs_other_maps_plot(char * outfile, int start, int end, int step, double c,
                                       int k) {
     struct timeMem {
         double build_time;
@@ -310,7 +331,9 @@ void generate_FXLT_vs_other_maps_plot(int start, int end, int step, double c,
 
     gnuplot_ctrl *h1 = gnuplot_init();
     gnuplot_cmd(h1, "set terminal png size 1000,1000\n");
-    gnuplot_cmd(h1, "set output \"../mcompar.png\"\n");
+    char * setoutputcmd = malloc(sizeof *setoutputcmd * (strlen(outfile) + 20));
+    sprintf(setoutputcmd, "set output \"%s\"\n", outfile);
+    gnuplot_cmd(h1, setoutputcmd);
     gnuplot_cmd(h1, "set multiplot layout 2,2\n");
     gnuplot_cmd(h1, "set key at screen 0.975, screen 0.350 font ',16' box ls 1 "
                     "lw 2 lc 'black' spacing 2\n");
@@ -406,7 +429,7 @@ void generate_FXLT_vs_other_maps_plot(int start, int end, int step, double c,
 }
 
 // compare a fuse bloomier filter to one without windowing
-void generate_spacial_coupling_advantage_plot(double start, double end,
+void generate_spacial_coupling_advantage_plot(char * outfile, double start, double end,
                                               double step, double n) {
     struct timeComp {
         double FXLT3;
@@ -498,7 +521,9 @@ void generate_spacial_coupling_advantage_plot(double start, double end,
     fprintf(stderr, "Generating Plot\n");
     gnuplot_ctrl *h1 = gnuplot_init();
     gnuplot_cmd(h1, "set terminal png size 500,500\n");
-    gnuplot_cmd(h1, "set output \"../mcompar.png\"\n");
+        char * setoutputcmd = malloc(sizeof *setoutputcmd * (strlen(outfile) + 20));
+    sprintf(setoutputcmd, "set output \"%s\"\n", outfile);
+    gnuplot_cmd(h1, setoutputcmd);
     // gnuplot_cmd(h1, "set multiplot layout 2,2\n");
     gnuplot_cmd(h1, "set key at screen 0.975, screen 0.350 font ',8' box ls 1 "
                     "lw 2 lc 'black' spacing 2\n");
@@ -619,7 +644,7 @@ bool **generate_FXLT_build_success_plot_helper(int nStart, int nEnd, int nStep,
     return built;
 }
 
-void generate_FXLT_build_success_plot(double cStart, double cEnd, double cStep,
+void generate_FXLT_build_success_plot(char * outfile, double cStart, double cEnd, double cStep,
                                       int k) {
 #define numIntervals 3
     int nStarts[numIntervals] = {100000, 1000000, 10000000};
@@ -627,7 +652,9 @@ void generate_FXLT_build_success_plot(double cStart, double cEnd, double cStep,
     int nSteps[numIntervals] = {100000, 1000000, 10000000};
     gnuplot_ctrl *h1 = gnuplot_init();
     gnuplot_cmd(h1, "set terminal png size 2000,2000\n");
-    gnuplot_cmd(h1, "set output \"../mwillbuild.png\"\n");
+        char * setoutputcmd = malloc(sizeof *setoutputcmd * (strlen(outfile) + 20));
+    sprintf(setoutputcmd, "set output \"%s\"\n", outfile);
+    gnuplot_cmd(h1, setoutputcmd);
     gnuplot_cmd(h1, "set multiplot layout 2,2\n");
     for (int i = 0; i < numIntervals; ++i) {
         const int NPOINTS = (nEnds[i] - nStarts[i]) / nSteps[i] + 1;
@@ -672,7 +699,7 @@ void generate_FXLT_build_success_plot(double cStart, double cEnd, double cStep,
     }
 }
 
-void testFXLT(int n, double c, int k) {
+void testFXLT(int n, double c, int k, size_t flags) {
     SizedPointer *keys = malloc(sizeof *keys * n);
     void **vals = malloc(sizeof *vals * n);
     for (int i = 0; i < n; ++i) {
@@ -691,16 +718,16 @@ void testFXLT(int n, double c, int k) {
     struct timespec start, finish;
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start);
     struct fuseXORierLookupTable * fxlt = build_fuseXORierLT(n, keys, vals,
-                                               c, k, FXLT_FLAG_PRINT_STATS /* | FXLT_FLAG_CACHE_HASHES | FXLT_FLAG_NO_SPATIAL_COUPLING */);
+                                               c, k, FXLT_FLAG_PRINT_STATS | flags);
 
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &finish);
     if (fxlt != NULL) {
-        printf("BF with c=%f n=%d done in %fs\n", c, n,
+        printf("FXLT with c=%f n=%d k=%d done in %fs\n", c, n, k,
                (finish.tv_sec - start.tv_sec) +
                    (double)(finish.tv_nsec - start.tv_nsec) / 1000000000.0);
 
     } else {
-        printf("BF with c=%f  n = %d, failed\n", c, n);
+        printf("FXLT with c=%f n=%d k=%d failed\n", c, n, k);
         for (int i = 0; i < n; ++i) {
             free(keys[i].ptr);
         }
@@ -713,8 +740,10 @@ void testFXLT(int n, double c, int k) {
         uintptr_t v = fuseXORierLT_lookup(fxlt, keys[i]);
         if (v != (uintptr_t)vals[i]) {
             printf("Failed to lookup %s\n", keys[i].ptr);
+            return;
         }
     }
+    printf("All lookups successful\n");
 
     int fp = 0;
     for (int i = 0; i < n; ++i) {
@@ -736,12 +765,26 @@ void testFXLT(int n, double c, int k) {
     free(vals);
 }
 
+//------------------------------------------------------------------------------
+// Main
+//------------------------------------------------------------------------------
+
 int main(void) {
-    // generate_FXLT_vs_other_maps_plot(1000000, 10000000, 100000, 1.1, 4);
-    // generate_spacial_coupling_advantage_plot(1.0, 1.4, .005, 10000000);
-    // generate_FXLT_build_success_plot(1.02, 1.085, .005, 3);
-    // generate_hash_advantage_plot(1000000, 6000000, 50000, 1.1, 4);
-    testFXLT(10000000, 1.075, 4);
+    // generate_FXLT_vs_other_maps_plot("../../fig.png", 1000000, 10000000, 100000, 1.1, 4);
+    // generate_spacial_coupling_advantage_plot("../../fig.png", 1.0, 1.4, .005, 10000000);
+    // generate_FXLT_build_success_plot("../../fig.png", 1.02, 1.085, .005, 3);
+    // generate_hash_advantage_plot("../../fig.png", 1000000, 6000000, 50000, 1.1, 4);
+    
+    printf("---Testing FXLT---\n");
+    testFXLT(10000000, 1.075, 4, 0);
+    printf("---Testing FXLT w/ Cache---\n");
+    testFXLT(10000000, 1.075, 4, FXLT_FLAG_CACHE_HASHES);
+    printf("---Testing FXLT k = 3---\n");
+    testFXLT(10000000, 1.125, 3, 0);
+    printf("---Testing FXLT k = 3 w/ Cache---\n");
+    testFXLT(10000000, 1.125, 3, FXLT_FLAG_CACHE_HASHES);
+    printf("---Testing FXLT w/ No Spatial Coupling---\n");
+    testFXLT(10000000, 1.23, 3, FXLT_FLAG_NO_SPATIAL_COUPLING | FXLT_FLAG_ALLOW_RETRY_BUILD);
 
     return 0;
 }
