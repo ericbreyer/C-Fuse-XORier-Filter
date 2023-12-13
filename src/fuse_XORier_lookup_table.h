@@ -20,6 +20,7 @@
 
 #include "sized_pointer.h" // SizedPointer
 #include <stdbool.h>       // bool
+#include <stddef.h>        // size_t
 
 #pragma once
 

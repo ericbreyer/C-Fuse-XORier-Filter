@@ -27,7 +27,7 @@
 #include <sys/stat.h> /* For mode constants */
 #include <time.h>
 
-#include "fused_XORier_lookup_table.h"
+#include <fuse_XORier_lookup_table.h>
 #include "gnuplot_i.h"
 #include "hash_table.h"
 #include "linked_hash_table.h"
