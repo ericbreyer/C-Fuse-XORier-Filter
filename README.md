@@ -48,6 +48,11 @@ see [fuse_XORier_lookup_table.h](https://github.com/ericbreyer/C-Fuse-XORier-Fil
 
 Pull requests are welcome. Feel free to fork this repo and make a pull request when ready. Don't forget to add a star!
 
+## Authors
+
+- [Eric Breyer](https://github.com/ericbreyer) - code and research
+- [Alan Liu](https://github.com/alanyliu) - research (python code in separate repo)
+
 ## License
 
 [GNU 3.0 or Later](https://www.gnu.org/licenses/gpl-3.0.html#license-text)
