@@ -38,7 +38,7 @@ void * val = fuseXORierLT_lookup(FXLT, (SizedPointer){rand() % 200, sizeof(int)}
 if(val == NULL) {
     // elem is definitely not in the map
 } else {
-    // elem is vary likely in the map with value val
+    // elem is very likely in the map with value val
 }
 ```
 

@@ -641,7 +641,7 @@ bool **generate_FXLT_build_success_plot_helper(int nStart, int nEnd, int nStep,
                n, omp_get_thread_num());
         flush_thread_progress();
     }
-    return built;
+    return (bool**)built;
 }
 
 void generate_FXLT_build_success_plot(char * outfile, double cStart, double cEnd, double cStep,
@@ -660,7 +660,7 @@ void generate_FXLT_build_success_plot(char * outfile, double cStart, double cEnd
         const int NPOINTS = (nEnds[i] - nStarts[i]) / nSteps[i] + 1;
         const int CPOINTS = (cEnd - cStart) / cStep + 1;
 
-        bool(*built)[CPOINTS] = generate_FXLT_build_success_plot_helper(
+        bool(*built)[CPOINTS] = (bool(*)[])generate_FXLT_build_success_plot_helper(
             nStarts[i], nEnds[i], nSteps[i], cStart, cEnd, cStep, k);
 
         // print data to file
@@ -737,7 +737,7 @@ void testFXLT(int n, double c, int k, size_t flags) {
     }
 
     for (int i = 0; i < n; ++i) {
-        uintptr_t v = fuseXORierLT_lookup(fxlt, keys[i]);
+        uintptr_t v = (uintptr_t)fuseXORierLT_lookup(fxlt, keys[i]);
         if (v != (uintptr_t)vals[i]) {
             printf("Failed to lookup %s\n", keys[i].ptr);
             return;
@@ -750,7 +750,7 @@ void testFXLT(int n, double c, int k, size_t flags) {
         char *intStr = malloc(sizeof *intStr * (i % 10 + 10));
         int len = sprintf(intStr, "%d dif", i);
         SizedPointer sp = {.ptr = intStr, .size = len};
-        uintptr_t v = fuseXORierLT_lookup(fxlt, sp);
+        uintptr_t v = (uintptr_t)fuseXORierLT_lookup(fxlt, sp);
         if (v != 0) {
             ++fp;
         }

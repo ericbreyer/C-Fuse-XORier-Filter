@@ -17,11 +17,11 @@
 //------------------------------------------------------------------------------
 // Includes
 //------------------------------------------------------------------------------
+#include <stdlib.h> // free and malloc
+#include <stdio.h>  // logging
+#include <string.h> // memcpy
 
 #include <math.h>   // pow
-#include <stdio.h>  // logging
-#include <stdlib.h> // free and malloc
-#include <string.h> // memcpy
 
 #include "config.h"                    // configuration options
 #include "fused_XORier_lookup_table.h" // interface
@@ -451,15 +451,18 @@ struct fuseXORierLookupTable *build_fuseXORierLT(size_t n, SizedPointer keys[n],
         segmentSize = numSegments = 0;
     }
 
+    // recalculate m based on actual segment size and number of segments
+    size_t real_m = (segmentSize == 0) ? m : segmentSize * numSegments;
+
     struct fuseXORierLookupTable init = {
         .k = k,
         .q = sizeof(slot_t) * 8,
         .segmentSize = segmentSize,
         .n = n,
-        .m = (segmentSize == 0) ? m : segmentSize * numSegments,
+        .m = real_m,
         .numSegments = numSegments,
-        .table1 = malloc(sizeof *self->table1 * m),
-        .table2 = malloc(sizeof *self->table2 * m),
+        .table1 = malloc(sizeof *self->table1 * real_m),
+        .table2 = malloc(sizeof *self->table2 * real_m),
         .verbose = flags & FXLT_FLAG_PRINT_STATS,
         .cacheHashes = flags & FXLT_FLAG_CACHE_HASHES,
     };
